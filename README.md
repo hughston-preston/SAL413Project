@@ -10,4 +10,4 @@ product was given in a youtube video where each of us summarize our respective c
 
 The youtube video can be found here: https://youtu.be/DCOG4go4uIE
 All Data was scraped using the baseballr package.
-the RMarkdown file is listed and entitled RFinalProjectCode.Rmd
+The RMarkdown file is listed and entitled RFinalProjectCode.Rmd
