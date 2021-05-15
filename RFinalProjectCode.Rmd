@@ -1,4 +1,4 @@
-##Research Question: Understanding Which Pitchers Work Better to Obtain Desired Events.
+##Research Question: Understanding Which Pitches Work Better to Obtain Desired Events.
 
 ##The idea is to understand which pitches work better to obtain a strikeout or a double play. Through this we can understand which pitches we should avoid in different scenarios and which pitches we should throw in a certain situation. 
 
