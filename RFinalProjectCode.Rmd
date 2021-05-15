@@ -1,0 +1,482 @@
+##Research Question: Understanding Which Pitchers Work Better to Obtain Desired Events.
+
+##The idea is to understand which pitches work better to obtain a strikeout or a double play. Through this we can understand which pitches we should avoid in different scenarios and which pitches we should throw in a certain situation. 
+
+##Group Members: Colin, Hughston, Justin, Kushal
+
+##Packages Used
+```{r}
+
+library(baseballr)
+library(tidyverse)
+library(ggplot2)
+library(shiny)
+library(ggrepel)
+library(dplyr)
+library(Lahman)
+library(shiny)
+
+```
+
+
+##Scraping Data
+```{r}
+##2015
+april2015_1 <- scrape_statcast_savant_pitcher_all("2015-04-05", "2015-04-07")
+april2015_2 <- scrape_statcast_savant_pitcher_all("2015-04-08", "2015-04-14")
+april2015_3 <- scrape_statcast_savant_pitcher_all("2015-04-15", "2015-04-22")
+april2015_4 <- scrape_statcast_savant_pitcher_all("2015-04-23", "2015-04-30")
+
+April2015 <- rbind(april2015_1, april2015_2, april2015_3, april2015_4)
+
+may2015_1 <- scrape_statcast_savant_pitcher_all("2015-05-01", "2015-05-07")
+may2015_2 <- scrape_statcast_savant_pitcher_all("2015-05-08", "2015-05-14")
+may2015_3 <- scrape_statcast_savant_pitcher_all("2015-05-15", "2015-05-22")
+may2015_4 <- scrape_statcast_savant_pitcher_all("2015-05-23", "2015-05-31")
+
+May2015 <- rbind(may2015_1, may2015_2, may2015_3, may2015_4)
+
+june2015_1 <- scrape_statcast_savant_pitcher_all("2015-06-01", "2015-06-07")
+june2015_2 <- scrape_statcast_savant_pitcher_all("2015-06-08", "2015-06-14")
+june2015_3 <- scrape_statcast_savant_pitcher_all("2015-06-15", "2015-06-22")
+june2015_4 <- scrape_statcast_savant_pitcher_all("2015-06-23", "2015-06-30")
+
+June2015 <- rbind(june2015_1, june2015_2, june2015_3, june2015_4)
+
+july2015_1 <- scrape_statcast_savant_pitcher_all("2015-07-01", "2015-07-07")
+july2015_2 <- scrape_statcast_savant_pitcher_all("2015-07-08", "2015-07-14")
+july2015_3 <- scrape_statcast_savant_pitcher_all("2015-07-15", "2015-07-22")
+july2015_4 <- scrape_statcast_savant_pitcher_all("2015-07-23", "2015-07-31")
+
+July2015 <- rbind(july2015_1, july2015_2, july2015_3, july2015_4)
+
+august2015_1 <- scrape_statcast_savant_pitcher_all("2015-08-01", "2015-08-07")
+august2015_2 <- scrape_statcast_savant_pitcher_all("2015-08-08", "2015-08-14")
+august2015_3 <- scrape_statcast_savant_pitcher_all("2015-08-15", "2015-08-22")
+august2015_4 <- scrape_statcast_savant_pitcher_all("2015-08-23", "2015-08-31")
+
+August2015 <- rbind(august2015_1, august2015_2, august2015_3, august2015_4)
+
+september2015_1 <- scrape_statcast_savant_pitcher_all("2015-09-01", "2015-09-07")
+september2015_2 <- scrape_statcast_savant_pitcher_all("2015-09-08", "2015-09-14")
+september2015_3 <- scrape_statcast_savant_pitcher_all("2015-09-15", "2015-09-22")
+september2015_4 <- scrape_statcast_savant_pitcher_all("2015-09-23", "2015-09-30")
+october <- scrape_statcast_savant_pitcher_all("2015-10-01", "2015-10-04")
+
+September2015 <- rbind(september2015_1, september2015_2, september2015_3, september2015_4, october)
+
+x2015data <- rbind(April2015, May2015, July2015, September2015, June2015, August2015)
+
+##2016
+april2016_1 <- scrape_statcast_savant_pitcher_all("2016-04-03", "2016-04-07")
+april2016_2 <- scrape_statcast_savant_pitcher_all("2016-04-08", "2016-04-14")
+april2016_3 <- scrape_statcast_savant_pitcher_all("2016-04-15", "2016-04-22")
+april2016_4 <- scrape_statcast_savant_pitcher_all("2016-04-23", "2016-04-30")
+
+April2016 <- rbind(april2016_1, april2016_2, april2016_3, april2016_4)
+
+may2016_1 <- scrape_statcast_savant_pitcher_all("2016-05-01", "2016-05-07")
+may2016_2 <- scrape_statcast_savant_pitcher_all("2016-05-08", "2016-05-14")
+may2016_3 <- scrape_statcast_savant_pitcher_all("2016-05-15", "2016-05-22")
+may2016_4 <- scrape_statcast_savant_pitcher_all("2016-05-23", "2016-05-31")
+
+May2016 <- rbind(may2016_1, may2016_2, may2016_3, may2016_4)
+
+june2016_1 <- scrape_statcast_savant_pitcher_all("2016-06-01", "2016-06-07")
+june2016_2 <- scrape_statcast_savant_pitcher_all("2016-06-08", "2016-06-14")
+june2016_3 <- scrape_statcast_savant_pitcher_all("2016-06-15", "2016-06-22")
+june2016_4 <- scrape_statcast_savant_pitcher_all("2016-06-23", "2016-06-30")
+
+June2016 <- rbind(june2016_1, june2016_2, june2016_3, june2016_4)
+
+july2016_1 <- scrape_statcast_savant_pitcher_all("2016-07-01", "2016-07-07")
+july2016_2 <- scrape_statcast_savant_pitcher_all("2016-07-08", "2016-07-14")
+july2016_3 <- scrape_statcast_savant_pitcher_all("2016-07-15", "2016-07-22")
+july2016_4 <- scrape_statcast_savant_pitcher_all("2016-07-23", "2016-07-31")
+
+July2016 <- rbind(july2016_1, july2016_2, july2016_3, july2016_4)
+
+august2016_1 <- scrape_statcast_savant_pitcher_all("2016-08-01", "2016-08-07")
+august2016_2 <- scrape_statcast_savant_pitcher_all("2016-08-08", "2016-08-14")
+august2016_3 <- scrape_statcast_savant_pitcher_all("2016-08-15", "2016-08-22")
+august2016_4 <- scrape_statcast_savant_pitcher_all("2016-08-23", "2016-08-31")
+
+August2016 <- rbind(august2016_1, august2016_2, august2016_3, august2016_4)
+
+september2016_1 <- scrape_statcast_savant_pitcher_all("2016-09-01", "2016-09-07")
+september2016_2 <- scrape_statcast_savant_pitcher_all("2016-09-08", "2016-09-14")
+september2016_3 <- scrape_statcast_savant_pitcher_all("2016-09-15", "2016-09-22")
+september2016_4 <- scrape_statcast_savant_pitcher_all("2016-09-23", "2016-09-30")
+october <- scrape_statcast_savant_pitcher_all("2016-10-01", "2016-10-02")
+
+September2016 <- rbind(september2016_1, september2016_2, september2016_3, september2016_4, october)
+
+x2016data <- rbind(April2016, May2016, July2016, September2016, June2016, August2016)
+
+##2017
+
+april2017_1 <- scrape_statcast_savant_pitcher_all("2017-04-02", "2017-04-07")
+april2017_2 <- scrape_statcast_savant_pitcher_all("2017-04-08", "2017-04-14")
+april2017_3 <- scrape_statcast_savant_pitcher_all("2017-04-15", "2017-04-22")
+april2017_4 <- scrape_statcast_savant_pitcher_all("2017-04-23", "2017-04-30")
+
+April2017 <- rbind(april2017_1, april2017_2, april2017_3, april2017_4)
+
+may2017_1 <- scrape_statcast_savant_pitcher_all("2017-05-01", "2017-05-07")
+may2017_2 <- scrape_statcast_savant_pitcher_all("2017-05-08", "2017-05-14")
+may2017_3 <- scrape_statcast_savant_pitcher_all("2017-05-15", "2017-05-22")
+may2017_4 <- scrape_statcast_savant_pitcher_all("2017-05-23", "2017-05-31")
+
+May2017 <- rbind(may2017_1, may2017_2, may2017_3, may2017_4)
+
+june2017_1 <- scrape_statcast_savant_pitcher_all("2017-06-01", "2017-06-07")
+june2017_2 <- scrape_statcast_savant_pitcher_all("2017-06-08", "2017-06-14")
+june2017_3 <- scrape_statcast_savant_pitcher_all("2017-06-15", "2017-06-22")
+june2017_4 <- scrape_statcast_savant_pitcher_all("2017-06-23", "2017-06-30")
+
+June2017 <- rbind(june2017_1, june2017_2, june2017_3, june2017_4)
+
+july2017_1 <- scrape_statcast_savant_pitcher_all("2017-07-01", "2017-07-07")
+july2017_2 <- scrape_statcast_savant_pitcher_all("2017-07-08", "2017-07-14")
+july2017_3 <- scrape_statcast_savant_pitcher_all("2017-07-15", "2017-07-22")
+july2017_4 <- scrape_statcast_savant_pitcher_all("2017-07-23", "2017-07-31")
+
+July2017 <- rbind(july2017_1, july2017_2, july2017_3, july2017_4)
+
+august2017_1 <- scrape_statcast_savant_pitcher_all("2017-08-01", "2017-08-07")
+august2017_2 <- scrape_statcast_savant_pitcher_all("2017-08-08", "2017-08-14")
+august2017_3 <- scrape_statcast_savant_pitcher_all("2017-08-15", "2017-08-22")
+august2017_4 <- scrape_statcast_savant_pitcher_all("2017-08-23", "2017-08-31")
+
+August2017 <- rbind(august2017_1, august2017_2, august2017_3, august2017_4)
+
+september2017_1 <- scrape_statcast_savant_pitcher_all("2017-09-01", "2017-09-07")
+september2017_2 <- scrape_statcast_savant_pitcher_all("2017-09-08", "2017-09-14")
+september2017_3 <- scrape_statcast_savant_pitcher_all("2017-09-15", "2017-09-22")
+september2017_4 <- scrape_statcast_savant_pitcher_all("2017-09-23", "2017-09-30")
+
+September2017 <- rbind(september2017_1, september2017_2, september2017_3, september2017_4)
+
+x2017data <- rbind(April2017, May2017, July2017, September2017, June2017, August2017)
+
+##2018
+april2018_1 <- scrape_statcast_savant_pitcher_all("2018-03-29", "2018-04-07")
+april2018_2 <- scrape_statcast_savant_pitcher_all("2018-04-08", "2018-04-14")
+april2018_3 <- scrape_statcast_savant_pitcher_all("2018-04-15", "2018-04-22")
+april2018_4 <- scrape_statcast_savant_pitcher_all("2018-04-23", "2018-04-30")
+
+April2018 <- rbind(april2018_1, april2018_2, april2018_3, april2018_4)
+
+may2018_1 <- scrape_statcast_savant_pitcher_all("2018-05-01", "2018-05-07")
+may2018_2 <- scrape_statcast_savant_pitcher_all("2018-05-08", "2018-05-14")
+may2018_3 <- scrape_statcast_savant_pitcher_all("2018-05-15", "2018-05-22")
+may2018_4 <- scrape_statcast_savant_pitcher_all("2018-05-23", "2018-05-31")
+
+May2018 <- rbind(may2018_1, may2018_2, may2018_3, may2018_4)
+
+june2018_1 <- scrape_statcast_savant_pitcher_all("2018-06-01", "2018-06-07")
+june2018_2 <- scrape_statcast_savant_pitcher_all("2018-06-08", "2018-06-14")
+june2018_3 <- scrape_statcast_savant_pitcher_all("2018-06-15", "2018-06-22")
+june2018_4 <- scrape_statcast_savant_pitcher_all("2018-06-23", "2018-06-30")
+
+June2018 <- rbind(june2018_1, june2018_2, june2018_3, june2018_4)
+
+july2018_1 <- scrape_statcast_savant_pitcher_all("2018-07-01", "2018-07-07")
+july2018_2 <- scrape_statcast_savant_pitcher_all("2018-07-08", "2018-07-14")
+july2018_3 <- scrape_statcast_savant_pitcher_all("2018-07-15", "2018-07-22")
+july2018_4 <- scrape_statcast_savant_pitcher_all("2018-07-23", "2018-07-31")
+
+July2018 <- rbind(july2018_1, july2018_2, july2018_3, july2018_4)
+
+august2018_1 <- scrape_statcast_savant_pitcher_all("2018-08-01", "2018-08-07")
+august2018_2 <- scrape_statcast_savant_pitcher_all("2018-08-08", "2018-08-14")
+august2018_3 <- scrape_statcast_savant_pitcher_all("2018-08-15", "2018-08-22")
+august2018_4 <- scrape_statcast_savant_pitcher_all("2018-08-23", "2018-08-31")
+
+August2018 <- rbind(august2018_1, august2018_2, august2018_3, august2018_4)
+
+september2018_1 <- scrape_statcast_savant_pitcher_all("2018-09-01", "2018-09-07")
+september2018_2 <- scrape_statcast_savant_pitcher_all("2018-09-08", "2018-09-14")
+september2018_3 <- scrape_statcast_savant_pitcher_all("2018-09-15", "2018-09-22")
+september2018_4 <- scrape_statcast_savant_pitcher_all("2018-09-23", "2018-09-30")
+
+September2018 <- rbind(september2018_1, september2018_2, september2018_3, september2018_4)
+
+x2018data <- rbind(April2018, May2018, July2018, September2018, June2018, August2018)
+
+##2019
+march2019 <- scrape_statcast_savant_pitcher_all("2019-03-28", "2019-03-31")
+april2019_1 <- scrape_statcast_savant_pitcher_all("2019-04-01", "2019-04-07")
+april2019_2 <- scrape_statcast_savant_pitcher_all("2019-04-08", "2019-04-14")
+april2019_3 <- scrape_statcast_savant_pitcher_all("2019-04-15", "2019-04-21")
+april2019_4 <- scrape_statcast_savant_pitcher_all("2019-04-22", "2019-04-30")
+
+April2019 <- rbind(march2019, april2019_1, april2019_2, april2019_3, april2019_4)
+
+may2019_1 <- scrape_statcast_savant_pitcher_all("2019-05-01", "2019-05-07")
+may2019_2 <- scrape_statcast_savant_pitcher_all("2019-05-08", "2019-05-14")
+may2019_3 <- scrape_statcast_savant_pitcher_all("2019-05-15", "2019-05-22")
+may2019_4 <- scrape_statcast_savant_pitcher_all("2019-05-23", "2019-05-31")
+
+May2019 <- rbind(may2019_1, may2019_2, may2019_3, may2019_4)
+
+june2019_1 <- scrape_statcast_savant_pitcher_all("2019-06-01", "2019-06-07")
+june2019_2 <- scrape_statcast_savant_pitcher_all("2019-06-08", "2019-06-14")
+june2019_3 <- scrape_statcast_savant_pitcher_all("2019-06-15", "2019-06-22")
+june2019_4 <- scrape_statcast_savant_pitcher_all("2019-06-23", "2019-06-30")
+
+June2019 <- rbind(june2019_1, june2019_2, june2019_3, june2019_4)
+
+july2019_1 <- scrape_statcast_savant_pitcher_all("2019-07-01", "2019-07-07")
+july2019_2 <- scrape_statcast_savant_pitcher_all("2019-07-08", "2019-07-14")
+july2019_3 <- scrape_statcast_savant_pitcher_all("2019-07-15", "2019-07-21")
+july2019_4 <- scrape_statcast_savant_pitcher_all("2019-07-22", "2019-07-31")
+
+July2019 <- rbind(july2019_1, july2019_2, july2019_3, july2019_4)
+
+august2019_1 <- scrape_statcast_savant_pitcher_all("2019-08-01", "2019-08-07")
+august2019_2 <- scrape_statcast_savant_pitcher_all("2019-08-08", "2019-08-14")
+august2019_3 <- scrape_statcast_savant_pitcher_all("2019-08-15", "2019-08-22")
+august2019_4 <- scrape_statcast_savant_pitcher_all("2019-08-23", "2019-08-31")
+
+August2019 <- rbind(august2019_1, august2019_2, august2019_3, august2019_4)
+
+september2019_1 <- scrape_statcast_savant_pitcher_all("2019-09-01", "2019-09-07")
+september2019_2 <- scrape_statcast_savant_pitcher_all("2019-09-08", "2019-09-14")
+september2019_3 <- scrape_statcast_savant_pitcher_all("2019-09-15", "2019-09-22")
+september2019_4 <- scrape_statcast_savant_pitcher_all("2019-09-23", "2019-09-30")
+
+September2019 <- rbind(september2019_1, september2019_2, september2019_3, september2019_4)
+
+x2019data <- rbind(April2019, May2019, July2019, September2019, June2019, August2019)
+
+data <- rbind(x2015data, x2016data, x2017data, x2018data, x2019data)
+write_csv(data, "data.csv")
+data <- read_csv("data.csv")
+```
+
+
+##Filtering and ReFormatting the Data
+```{r}
+##Removing PitchTypes that were inaccurate/corrupt
+data <- data %>% filter(!grepl("160421", pitch_type))
+data <- data %>% filter(!grepl("160422", pitch_type))
+data <- data %>%  filter(data$pitch_type != "null")
+
+##Only Strikeout
+strikeoutdata <- data %>%  filter(data$events=="strikeout")
+
+##When the count has 2 strikes
+twostrikes <- data %>% filter(data$strikes==2)
+
+##Only Double Plays
+doubleplaydata <- data %>% filter(data$events == "double_play" | data$events == "grounded_into_double_play")
+
+##New Coloumn with 1 and 0 if strikeout occurred 
+strikeoutbinary <- data %>% mutate(strikeout = if_else(events=="strikeout", 1, 0))
+strikeoutbinary <- strikeoutbinary %>% filter(strikeoutbinary$strikes == 2)
+
+##New Coloumn with 1 and 0 if double play occurred 
+doubleplaybinary <- data %>% mutate(doubleplay = if_else(events=="double_play" | data$events == "grounded_into_double_play", 1, 0)) %>% filter(outs_when_up != 2)
+```
+
+
+##Visuals1
+```{r}
+doubleplayovertime <- ggplot(data = doubleplaydata, mapping = aes(x = doubleplaydata$year)) + geom_line(aes(color = doubleplaydata$pitch_type), stat="count", size=1) + xlab("Year") + ggtitle("Double Plays per Pitch Over Time") + scale_color_manual(values = c("black", "gold", "cornflower blue", "green", "darkred", "darkgreen", "purple", "pink", "darkblue", "orange", "brown", "red")) 
+doubleplayovertime
+ggsave("DoublePlaysPerPitchOverTime.pdf", width = 5, height = 5)
+
+
+strikeoutovertime <- ggplot(data = strikeoutdata, mapping = aes(x = strikeoutdata$year)) + geom_line(aes(color = pitch_type), stat="count", size=1) + xlab("Year") + ggtitle("Strikouts per Pitch Over Time") + scale_color_manual(values = c("black", "gold", "cornflower blue", "green", "darkred", "darkgreen", "purple", "pink", "darkblue", "orange", "brown", "red"))
+strikeoutovertime
+ggsave("StrikeoutsPerPitchOverTime.pdf", width = 5, height = 5)
+```
+
+
+##Visuals2
+```{r}
+#Doubleplay Plots
+
+plate_width <- 17 + 2 * (9/pi)
+k_zone_plot <- ggplot(NULL, aes(x= plate_x, y= plate_z)) +
+  geom_rect(xmin = -(plate_width/2)/12,
+            xmax = (plate_width/2)/12,
+            ymin = 1.5,
+            ymax = 3.6, color = "cornflowerblue", alpha=0) +
+  coord_equal() +
+  scale_x_continuous("Horizontal location (ft.)",
+                     limits = c(-2,2)) +
+  scale_y_continuous("Vertical location (ft.)",
+                     limits = c(0,5))
+countDP <- doubleplaydata %>%
+  count(pitch_type)
+
+names(countDP)[names(countDP)=="n"] <- "Number of Pitches"
+
+doubleplaypitchtype <- barplot(countDP$`Number of Pitches`, names.arg = countDP$pitch_type, xlab = "Pitch", ylab = "Frequency", col = "cornflowerblue", main = "Number of Times Pitch Caused a Doubleplay 2015-2019", border = "red")
+doubleplaypitchtype
+
+doubleplaypitchlocations <- k_zone_plot %+% sample_n(doubleplaydata, 10000) +
+  aes(color = pitch_name) +
+  geom_point(alpha = 0.1) + ggtitle("Pitch Locations for Double Play Pitches")
+doubleplaypitchlocations
+
+##Strikeout Plots
+
+countKs <- strikeoutdata %>%
+  count(pitch_type)
+
+names(countKs)[names(countKs)=="n"] <- "Number of Pitches"
+
+countKs %>% mutate("Pitch Percent" = (`Number of Pitches` / 200004)*100) -> countKs
+
+twostrikesPitch <- ggplot(data = twostrikes, mapping= aes(x=twostrikes$pitch_type))+geom_bar(aes(fill=twostrikes$pitch_type), stat="count")+xlab("Pitch Type") + ggtitle("Pitch Type Thrown When The Count has Two Strikes")
+twostrikesPitch
+
+strikeoutpitchtype <- barplot(countKs$`Number of Pitches`, names.arg = countKs$pitch_type, xlab = "Pitch", ylab = "Frequency", col = "cornflowerblue", main = "Number of Times Pitch Caused a Strikeout 2015-2019", border = "red")
+strikeoutpitchtype
+
+strikeoutpitchlocations <- k_zone_plot %+% sample_n(strikeoutdata, 10000) +
+  aes(color = pitch_name) +
+  geom_point(alpha = 0.1) + ggtitle("Pitch Locations for Strikeout Pitches")
+strikeoutpitchlocations
+
+```
+
+
+##Regressions
+```{r}
+pitchreg <- lm(strikeout ~factor(pitch_type), data=strikeoutbinary)
+summary(pitchreg)
+
+##This regression measures which pitches are more likely to result in a strikeout when the count already has 2 strikes.
+##A positive coefficient implies the pitch is more likely and a negative coefficinet implies the pitch is less likely to result in a strikeout.
+##Statistically Significant with +ve coefficients: CU, EP, FS, KC, SL
+##Statistically Significant with -ve coefficients: FF, FT, KN, PO, SI
+
+
+doubleplayreg <- lm(doubleplay ~factor(pitch_type), data=doubleplaybinary)
+summary(doubleplayreg)
+##This regression measures which pitches are more likely to result in a doubleplay.
+##A positive coefficient implies the pitch is more likely and a negative coefficinet implies the pitch is less likely to result in a doubleplay.
+##Statistically Significant with +ve coefficients: FT, SC, SI
+##Statistically Significant with -ve coefficients: CU, FF, FS, IN, KC, SL
+
+```
+
+
+##Visual Based On Regressions
+```{r}
+
+plate_width <- 17 + 2 * (9/pi)
+k_zone_plot <- ggplot(NULL, aes(x= plate_x, y= plate_z)) +
+  geom_rect(xmin = -(plate_width/2)/12,
+            xmax = (plate_width/2)/12,
+            ymin = 1.5,
+            ymax = 3.6, color = "cornflowerblue", alpha=0) +
+  coord_equal() +
+  scale_x_continuous("Horizontal location (ft.)",
+                     limits = c(-2,2)) +
+  scale_y_continuous("Vertical location (ft.)",
+                     limits = c(0,5))
+
+zone_dataCU <- strikeoutdata %>% filter(pitch_type == "CU")
+CUstrikezone <- k_zone_plot %+% zone_dataCU +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Strikeout Pitchtype Locations")
+CUstrikezone
+
+zone_dataEP <- strikeoutdata %>% filter(pitch_type == "EP")
+EPstrikezone <- k_zone_plot %+% zone_dataEP +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Strikeout Pitchtype Locations")
+EPstrikezone
+
+zone_dataFS <- strikeoutdata %>% filter(pitch_type == "FS")
+FSstrikezone <- k_zone_plot %+% zone_dataFS +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Strikeout Pitchtype Locations")
+FSstrikezone
+
+
+zone_dataKC <- strikeoutdata %>% filter(pitch_type == "KC")
+KCstrikezone <- k_zone_plot %+% zone_dataKC +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Strikeout Pitchtype Locations")
+KCstrikezone
+
+zone_dataSL <- strikeoutdata %>% filter(pitch_type == "SL")
+SLstrikezone <- k_zone_plot %+% zone_dataSL +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Strikeout Pitchtype Locations")
+SLstrikezone
+
+
+zone_dataSIdp <- doubleplaydata %>% filter(pitch_type == "SI")
+SIstrikezonedp <- k_zone_plot %+% zone_dataFS +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("DoublePlay Pitchtype Locations")
+SIstrikezonedp
+
+
+zone_dataSCdp <- doubleplaydata %>% filter(pitch_type == "SC")
+SCstrikezonedp <- k_zone_plot %+% zone_dataKC +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("Doubleplay Pitchtype Locations")
+SCstrikezonedp
+
+
+zone_dataFTdp <- doubleplaydata %>% filter(pitch_type == "FT")
+FSstrikezonedp <- k_zone_plot %+% zone_dataSL +
+  aes(color = pitch_name, shape = pitch_name) +
+  geom_point(alpha = 0.7) +
+  ggtitle("DoublePlay Pitchtype Locations")
+FSstrikezonedp
+```
+
+##Shiny
+```{r}
+people <- read_csv("https://raw.githubusercontent.com/chadwickbureau/register/master/data/people.csv")
+people_ID <- select(people, key_bbref, key_person, key_mlbam, key_retro)
+Master %>% left_join(people_ID, by = c("playerID" = "key_bbref")) -> Master_ID
+data %>% left_join(Master_ID, by = c("batter" = "key_mlbam")) -> my_pitches
+
+ui <- fluidPage(
+  titlePanel("The Body Weight Factor of Double Plays"), 
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput(inputId = "bins",
+                  label = "Number of Bins",
+                  min = 1,
+                  max = 200,
+                  value = 30)
+      
+    ),
+    mainPanel(
+      plotOutput(outputId = "distPlot")
+    )
+  )
+)
+
+
+server <- function(input, output){
+  output$distPlot <- renderPlot({
+    double_play <- my_pitches %>% filter(events == "grounded_into_double_play")
+    ggplot(double_play, aes(x = weight, color = pitch_type)) +
+      geom_histogram(bins = input$bins) + ggtitle("Histogram of Pitches of Player Weight and Double Plays Colored by Pitch Type") +
+      xlab("Player Weight") + ylab("Number of Double Plays")
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+```
+
